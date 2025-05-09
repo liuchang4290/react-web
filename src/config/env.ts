@@ -1,8 +1,8 @@
 import { DEV, PROD } from './constance';
 
 const API_MAP = {
-  [DEV]: 'https://api.blinktech.com.cn/core',
-  [PROD]: 'https://api.focos.tech/core',
+  [DEV]: '',
+  [PROD]: '',
 };
 
 type EnvKey = keyof typeof API_MAP;

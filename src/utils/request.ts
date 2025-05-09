@@ -2,8 +2,6 @@ import axios from 'axios';
 
 import env from '../config/env';
 
-import { clearAuthToken, isAuthenticated } from './auth';
-
 import type { AxiosRequestConfig } from 'axios';
 
 // 创建axios实例
@@ -15,13 +13,6 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
-    // 如果已登录，则添加token到请求头
-    if (isAuthenticated()) {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        config.headers.authToken = token;
-      }
-    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -36,17 +27,6 @@ service.interceptors.response.use(
     // 假设返回格式为 { code: number, data: unknown, message: string }
     if (data && typeof data === 'object' && 'code' in data) {
       const code = data.code as number;
-
-      // 处理401错误（未授权/token过期）
-      if (code === 401) {
-        // 清除认证信息
-        clearAuthToken();
-        // 跳转到登录页
-        window.location.href = '/login';
-        return Promise.reject(
-          new Error((data.message as string) || '身份验证失败，请重新登录')
-        );
-      }
 
       // 如果返回的code不是成功状态码
       if (code !== 200) {
@@ -63,13 +43,7 @@ service.interceptors.response.use(
   (error) => {
     // 处理HTTP错误
     if (error.response) {
-      // 处理401错误（未授权/token过期）
-      if (error.response.status === 401) {
-        // 清除认证信息
-        clearAuthToken();
-        // 跳转到登录页
-        window.location.href = '/login';
-      }
+      // 处理错误信息
     }
     return Promise.reject(error);
   }
